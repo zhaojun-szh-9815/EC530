@@ -2,13 +2,13 @@ import json
 import os
 import datetime
 
-data_dir = "./Data/"
+data_dir = "./"
 
 def make_json_input():
     if not os.path.exists(data_dir):
         os.mkdir(data_dir)
 
-    user_dictlist = [dict({"u_id": 1, "full_name": "Zihao", "role": "Developer", "gender": "male", "created_at": "2022-02-18", "phone": "1234567890"}),
+    user_dictlist = [dict({"u_id": 1, "full_name": "ZH", "role": "Developer", "gender": "male", "created_at": "2022-02-18", "phone": "1234567890"}),
                          dict({"u_id": 2, "full_name": "AAA", "role": "Doctor", "gender": "male", "created_at": "2022-02-18", "phone": "0123456789"}),
                          dict({"u_id": 3, "full_name": "BBB", "role": "Patient", "gender": "male", "created_at": "2022-02-18", "phone": "1111111111"})]
 
@@ -155,7 +155,7 @@ def new_data_captured(assignment, value):
     new_sample = dict({"r_id": len(records)+1, "a_id": assignment, "value": value})
     records.append(new_sample)
     store_records(records)
-    print(records)
+    # print(records)
     return records
 
 if __name__ == '__main__':
@@ -163,4 +163,4 @@ if __name__ == '__main__':
     # users = user_registration("CCC","Nurse","Male","2222222222")
     # devices = device_registration("height_machine", "Height")
     # assignments = new_assignment(2, 3, 3)
-    records = new_data_captured(2, 100)
+    # records = new_data_captured(2, 100)
