@@ -1,166 +1,316 @@
-import json
-import os
-import datetime
+import sqlite3
 
-data_dir = "./"
+db_dir = './db_ec530_p2.db'
 
-def make_json_input():
-    if not os.path.exists(data_dir):
-        os.mkdir(data_dir)
+def create_connection(db_file):
+    conn = None
+    try:
+        conn = sqlite3.connect(db_file)
+    except Error as e:
+        print(e)
 
-    user_dictlist = [dict({"u_id": 1, "full_name": "ZH", "role": "Developer", "gender": "male", "created_at": "2022-02-18", "phone": "1234567890"}),
-                         dict({"u_id": 2, "full_name": "AAA", "role": "Doctor", "gender": "male", "created_at": "2022-02-18", "phone": "0123456789"}),
-                         dict({"u_id": 3, "full_name": "BBB", "role": "Patient", "gender": "male", "created_at": "2022-02-18", "phone": "1111111111"})]
+    # print('connect success')
+    return conn
 
-    device_dictlist = [dict({"d_id": 1, "type": "sphygmomanometer", "value_type": "Blood_Pressure"}),
-                       dict({"d_id": 2, "type": "thermometer", "value_type": "Temperature"}),
-                       dict({"d_id": 3, "type": "pulse_device", "value_type": "Pulse"}),
-                       dict({"d_id": 4, "type": "oximeter", "value_type": "Blood_Oxygen"}),
-                       dict({"d_id": 5, "type": "weight_machine", "value_type": "Weight"}),
-                       dict({"d_id": 6, "type": "glucometer", "value_type": "Blood_Glucose"})]
+def print_rows(rows):
+    for row in rows:
+        print(row)
 
-    assignment_dictlist = [dict({"a_id": 1, "assign_person": 2, "assigned_to": 3, "device": 1}),
-                               dict({"a_id": 2, "assign_person": 2, "assigned_to": 3, "device": 2})]
+def sqlite_custom_function(id):
+    conn = create_connection(db_dir)
+    user = select_user(conn, id)
+    conn.close()
+    return user[4]
 
-    data_captured_dictlist = [dict({"r_id": 1, "a_id": 1, "value": 100.0}),
-                              dict({"r_id": 2, "a_id": 2, "value": 37.5})]
+def select_all_users(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users")
+    rows = cur.fetchall()
+    return rows
 
-    store_users(user_dictlist)
-    store_devices(device_dictlist)
-    store_assignments(assignment_dictlist)
-    store_records(data_captured_dictlist)
+def select_user(conn, id):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users where U_ID = ?", (id,))
+    rows = cur.fetchall()
+    try:
+        return rows[0]
+    except Exception as e:
+        print(f"No user with U_ID = {id}")
+        return None
 
-def store_users(users):
-    json_user = json.dumps(users)
-    f = open(data_dir + 'user.json','w')
-    f.write(json_user)
-    f.close()
+def insert_user(conn, fn, ln, gender, role, phone, dob, h, w):
+    rows = select_all_users(conn)
+    new_user = (len(rows)+1, fn, ln, gender, role, phone, dob, h, w)
+    sql = ''' INSERT INTO users (U_ID, First_Name, Last_Name, Gender, Role, Phone, Date_of_Birth, Height_in_cm, Weight_in_kg)
+              VALUES(?,?,?,?,?,?,?,?,?) '''
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, new_user)
+        conn.commit()
+    except Exception as e:
+        print(e)
+    return cur.lastrowid
 
-def store_devices(devices):
-    json_device = json.dumps(devices)
-    f = open(data_dir + 'device.json','w')
-    f.write(json_device)
-    f.close()
+def delete_user(conn, id):
+    sql = 'DELETE FROM users WHERE U_ID=?'
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, (id,))
+        conn.commit()
+    except Exception as e:
+        print(e)
+    return cur.lastrowid
 
-def store_assignments(assignments):
-    json_assignment = json.dumps(assignments)
-    f = open(data_dir + 'assignment.json','w')
-    f.write(json_assignment)
-    f.close()
+def update_user(conn, id, phone, h, w):
+    update_info = (phone, h, w, id)
+    sql = ''' UPDATE users
+              SET Phone = ? ,
+                  Height_in_cm = ? ,
+                  Weight_in_kg = ?
+              WHERE U_ID = ?'''
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, update_info)
+        conn.commit()
+    except Exception as e:
+        print(e)
+    user = select_user(conn, id)
+    print(user)
+    return user
 
-def store_records(records):
-    json_data_captured = json.dumps(records)
-    f = open(data_dir + 'data_captured.json','w')
-    f.write(json_data_captured)
-    f.close()
+def select_all_devices(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM devices")
+    rows = cur.fetchall()
+    return rows
 
-def load_users():
-    load_list = os.listdir(data_dir)
-    users = []
-    if "user.json" in load_list:
-        f = open(data_dir + 'user.json','r')
-        users = json.loads(f.read())
-        f.close()
+def select_device(conn, id):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM devices where D_ID = ?", (id,))
+    rows = cur.fetchall()
+    try:
+        return rows[0]
+    except Exception as e:
+        print(f"No device with D_ID = {id}")
+        return None
 
-    return users
+def insert_device(conn, dor, dt):
+    rows = select_all_devices(conn)
+    new_device = (len(rows)+1, dor, dt)
+    sql = ''' INSERT INTO devices (D_ID, Date_of_Registration, Data_type)
+              VALUES(?,?,?) '''
+    cur = conn.cursor()
 
-def load_devices():
-    load_list = os.listdir(data_dir)
-    devices = []
-    if "device.json" in load_list:
-        f = open(data_dir + 'device.json','r')
-        devices = json.loads(f.read())
-        f.close()
+    try:
+        cur.execute(sql, new_device)
+        conn.commit()
+    except Exception as e:
+        print(e)
 
-    return devices
+    return cur.lastrowid
 
-def load_assignments():
-    load_list = os.listdir(data_dir)
-    assignments = []
-    if "assignment.json" in load_list:
-        f = open(data_dir + 'assignment.json','r')
-        assignments = json.loads(f.read())
-        f.close()
+def delete_device(conn, id):
+    sql = 'DELETE FROM devices WHERE D_ID=?'
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, (id,))
+        conn.commit()
+    except Exception as e:
+        print(e)
+    return cur.lastrowid
 
-    return assignments
+def update_device(conn, id, dor, dt):
+    update_info = (dor, dt, id)
+    sql = ''' UPDATE devices
+              SET Date_of_Registration = ? ,
+                  Data_type = ?
+              WHERE D_ID = ?'''
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, update_info)
+        conn.commit()
+    except Exception as e:
+        print(e)
+    device = select_device(conn, id)
+    print(device)
 
-def load_records():
-    load_list = os.listdir(data_dir)
-    records = []
-    if "data_captured.json" in load_list:
-        f = open(data_dir + 'data_captured.json','r')
-        records = json.loads(f.read())
-        f.close()
+def select_all_assignments(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM device_assignment")
+    rows = cur.fetchall()
+    return rows
 
-    return records
+def select_assignment(conn, id):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM device_assignment where A_ID = ?", (id,))
+    rows = cur.fetchall()
+    try:
+        return rows[0]
+    except Exception as e:
+        print(f"No device_assignment with A_ID = {id}")
+        return None
 
-def user_registration(name, role, gender, phone):
-    users = load_users()
-    new_sample = dict({"u_id":len(users)+1, "full_name": name, "role": role, "gender": gender, "created_at": datetime.datetime.now().strftime("%Y-%m-%d"), "phone": str(phone)})
-    users.append(new_sample)
-    store_users(users)
-    return users
+def insert_assignment(conn, rp, at, dev):
+    rows = select_all_assignments(conn)
+    new_assignment = (len(rows)+1, rp, at, dev)
+    sql = ''' INSERT INTO device_assignment (A_ID, Responsible_Person, Assign_to, Device)
+              VALUES(?,?,?,?) '''
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, new_assignment)
+        conn.commit()
+    except Exception as e:
+        print(e)
 
-def device_registration(type, value_type):
-    devices = load_devices()
-    new_sample = dict({"d_id": len(devices)+1, "type": type, "value_type": value_type})
-    devices.append(new_sample)
-    store_devices(devices)
-    # print(devices)
-    return devices
+    return cur.lastrowid
 
-def new_assignment(assign_person, assigned_to, device):
-    assignments = load_assignments()
-    devices = load_devices()
-    users = load_users()
-    if (not isinstance(assign_person, int) and (not isinstance(assigned_to, int)) and (not isinstance(device, int))):
-        print("expected parameter 1, 2, 3 are integer")
-        return assignments
+def delete_assignment(conn, id):
+    sql = 'DELETE FROM device_assignment WHERE A_ID=?'
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, (id,))
+        conn.commit()
+    except Exception as e:
+        print(e)
+    return cur.lastrowid
 
-    if (assign_person > len(users) or assigned_to > len(users)):
-        print("parameter 1 or 2 is not in user list")
-        return assignments
+def update_assignment(conn, id, rp, at, dev):
+    update_info = (rp, at, dev, id)
+    sql = ''' UPDATE device_assignment
+              SET Responsible_Person = ? ,
+                  Assign_to = ?,
+                  Device = ?
+              WHERE A_ID = ?'''
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, update_info)
+        conn.commit()
+    except Exception as e:
+        print(e)
+    assignment = select_assignment(conn, id)
+    print(assignment)
 
-    if (device > len(devices)):
-        print("parameter 3 is not in devices list")
-        return assignments
+def select_all_records(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM record")
+    rows = cur.fetchall()
+    return rows
 
-    if (users[assign_person-1]["role"] != "Doctor" and users[assign_person-1]["role"] != "Nurse"):
-        print("Person who make the assignment should be Doctor or Nurse")
-        return assignments
+def select_record(conn, id):
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM record where R_ID = ?", (id,))
+    rows = cur.fetchall()
+    try:
+        return rows[0]
+    except Exception as e:
+        print(f"No record with R_ID = {id}")
+        return None
 
-    if (users[assigned_to-1]["role"] != "Patient"):
-        print("Only patients could be assigned to devices")
-        return assignments
+def insert_record(conn, assignment, rectime, value):
+    rows = select_all_records(conn)
+    new_record = (len(rows)+1, assignment, rectime, value)
+    sql = ''' INSERT INTO record (R_ID, Assignment, Record_time, Value)
+              VALUES(?,?,?,?) '''
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, new_record)
+        conn.commit()
+    except Exception as e:
+        print(e)
 
-    new_sample = dict({"a_id": len(assignments)+1, "assign_person": assign_person, "assigned_to": assigned_to, "device": device})
-    assignments.append(new_sample)
-    store_assignments(assignments)
-    # print(assignments)
-    return assignments
+    return cur.lastrowid
 
-def new_data_captured(assignment, value):
-    records = load_records()
-    assignments = load_assignments()
-    if (not isinstance(assignment, int)):
-        print("expected parameter 1 is integer")
-        return records
-    if (assignment > len(assignments)):
-        print(f"Do not have assignment {assignment}")
-        return records
-    if (not isinstance(value, int)) and (not isinstance(value, float)):
-        print("expected parameter 2 is int or float")
-        return records
+def delete_record(conn, id):
+    sql = 'DELETE FROM record WHERE R_ID=?'
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, (id,))
+        conn.commit()
+    except Exception as e:
+        print(e)
+    return cur.lastrowid
 
-    new_sample = dict({"r_id": len(records)+1, "a_id": assignment, "value": value})
-    records.append(new_sample)
-    store_records(records)
-    # print(records)
-    return records
+def update_record(conn, id, assignment, rectime, value):
+    update_info = (assignment, rectime, value, id)
+    sql = ''' UPDATE record
+              SET Assignment = ? ,
+                  Record_time = ?,
+                  Value = ?
+              WHERE R_ID = ?'''
+    cur = conn.cursor()
+    try:
+        cur.execute(sql, update_info)
+        conn.commit()
+    except Exception as e:
+        print(e)
+    record = select_record(conn, id)
+    print(record)
+
 
 if __name__ == '__main__':
-    make_json_input()
-    # users = user_registration("CCC","Nurse","Male","2222222222")
-    # devices = device_registration("height_machine", "Height")
-    # assignments = new_assignment(2, 3, 3)
-    # records = new_data_captured(2, 100)
+    conn = create_connection(db_dir)
+    conn.create_function("check_role", 1, sqlite_custom_function)
+
+    '''
+    rows = select_all_users(conn)
+    print_rows(rows)
+    last_id = insert_user(conn, 'DD', 'D', 'Male', 'Patient', '3333333333', '2022-02-18', 180, 78)
+    last_id = insert_user(conn, 'DD', 'D', 'Male', 'Patient', '3333333333', '2022-02-18', 180, 78)
+    last_id = delete_user(conn, 6)
+    rows = select_all_users(conn)
+    print_rows(rows)
+    update_user(conn, 5, "3334443333", 180, 78)
+    last_id = delete_user(conn, 5)
+    print_rows(rows)
+    '''
+
+    '''
+    rows = select_all_devices(conn)
+    print_rows(rows)
+    insert_device(conn, '2022-02-20','Temperature')
+    insert_device(conn, '2022-02-21','Pressure')
+    insert_device(conn, '2022-02-21','Blood_Pressure')
+    delete_device(conn, 7)
+    rows = select_all_devices(conn)
+    print_rows(rows)
+    update_device(conn, 6, '2022-02-20', 'Pluse')
+    select_device(conn, 7)
+    delete_device(conn, 6)
+    rows = select_all_devices(conn)
+    print_rows(rows)
+    '''
+    
+    '''
+    rows = select_all_assignments(conn)
+    print_rows(rows)
+    last_id = insert_assignment(conn, 2, 4, 5)
+    last_id = insert_assignment(conn, 1, 4, 5)
+    last_id = insert_assignment(conn, 3, 4, 5)
+    rows = select_all_assignments(conn)
+    print_rows(rows)
+    last_id = delete_assignment(conn, 4)
+    update_assignment(conn, 3, 3, 4, 3)
+    rows = select_all_assignments(conn)
+    print_rows(rows)
+    delete_assignment(conn, 3)
+    rows = select_all_assignments(conn)
+    print_rows(rows)
+    '''
+
+    '''
+    rows = select_all_records(conn)
+    print_rows(rows)
+    last_id = insert_record(conn, 2, '2022-02-19', 140)
+    last_id = insert_record(conn, 1, '2022-02-20', 36.5)
+    rows = select_all_records(conn)
+    print_rows(rows)
+    last_id = delete_record(conn, 5)
+    update_record(conn, 4, 1, '2022-02-19', 36.9)
+    rows = select_all_records(conn)
+    print_rows(rows)
+    delete_record(conn, 4)
+    rows = select_all_records(conn)
+    print_rows(rows)
+    '''
+
+    conn.close()
