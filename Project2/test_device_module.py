@@ -1,7 +1,7 @@
 import pytest
 import device_module as dm
 
-db_dir = './db_ec530_p2.db'
+db_dir = './ec530_p2.db'
 
 @pytest.mark.parametrize('id, output',
                          [('1', "(1, 'ZH', 'S', 'Male', 'Developer', '0123456789', '1998-01-05', 175, 80)"),
