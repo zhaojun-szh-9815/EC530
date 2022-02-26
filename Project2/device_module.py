@@ -1,6 +1,7 @@
 import sqlite3
+import os
 
-db_dir = './db_ec530_p2.db'
+db_dir = './ec530_p2.db'
 
 def create_connection(db_file):
     conn = None
@@ -21,6 +22,57 @@ def sqlite_custom_function(id):
     user = select_user(conn, id)
     conn.close()
     return user[4]
+
+def create_table(conn, sql):
+    try:
+        c = conn.cursor()
+        c.execute(sql)
+    except Exception as e:
+        print(e)
+
+def init_dataset():
+    if os.path.exists(db_dir):
+        os.remove(db_dir)
+        
+    conn = create_connection(db_dir)
+    conn.create_function("check_role", 1, sqlite_custom_function)
+
+    sql_create_users = '''CREATE TABLE users (U_ID INTEGER PRIMARY KEY AUTOINCREMENT, First_Name TEXT NOT NULL, Last_Name TEXT NOT NULL, Gender TEXT CHECK (Gender IN ('Male', 'Female')) DEFAULT ('Male') NOT NULL, Role TEXT CHECK (Role IN ('Doctor', 'Nurse', 'Patient', 'Family', 'Developer')) NOT NULL DEFAULT ('Patient'), Phone TEXT CHECK (LENGTH(Phone) = 10) DEFAULT (0), Date_of_Birth DATETIME NOT NULL, Height_in_cm INT NOT NULL, Weight_in_kg INT NOT NULL);'''
+
+    sql_create_devices = '''CREATE TABLE devices (D_ID INTEGER PRIMARY KEY AUTOINCREMENT, Date_of_Registration DATETIME NOT NULL, Data_type TEXT NOT NULL CHECK (Data_type IN ('Temperature', 'Blood_Pressure', 'Pluse', 'Blood_Oxygen', 'Blood_Glucose')));'''
+
+    sql_create_assignments = '''CREATE TABLE device_assignment (A_ID INTEGER PRIMARY KEY AUTOINCREMENT, Responsible_Person INT REFERENCES users (U_ID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL CHECK (check_role(Responsible_Person) = 'Doctor' or check_role(Responsible_Person) = 'Nurse'), Assign_to INT REFERENCES users (U_ID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL CHECK (check_role(Assign_to) = 'Patient'), Device INT REFERENCES devices (D_ID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL);'''
+
+    sql_create_records = '''CREATE TABLE record (R_ID INTEGER PRIMARY KEY AUTOINCREMENT, Assignment INT REFERENCES device_assignment (A_ID) ON DELETE CASCADE ON UPDATE CASCADE NOT NULL, Record_time DATETIME NOT NULL, Value DOUBLE NOT NULL);'''
+
+    if conn is not None:
+        create_table(conn, sql_create_users)
+        create_table(conn, sql_create_devices)
+        create_table(conn, sql_create_assignments)
+        create_table(conn, sql_create_records)
+    else:
+        print("Error! cannot create the database connection.")
+
+    insert_user(conn, 'ZH', 'S', 'Male', 'Developer', '0123456789', '1998-01-05', 175, 80)
+    insert_user(conn, 'AA', 'A', 'Female', 'Doctor', '1234567890', '1997-04-02', 170, 50)
+    insert_user(conn, 'BB', 'B', 'Female', 'Nurse', '0000011111', '1999-02-18', 168, 48)
+    insert_user(conn, 'CC', 'C', 'Male', 'Patient', '1111100000', '2000-11-06', 180, 78)
+
+    insert_device(conn, '2019-01-01', 'Temperature')
+    insert_device(conn, '2019-01-02', 'Blood_Pressure')
+    insert_device(conn, '2019-01-03', 'Pluse')
+    insert_device(conn, '2019-02-02', 'Blood_Oxygen')
+    insert_device(conn, '2019-02-04', 'Blood_Glucose')
+
+    insert_assignment(conn, 2, 4, 1)
+    insert_assignment(conn, 3, 4, 2)
+
+    insert_record(conn, 1, '2022-2-10', 37.5)
+    insert_record(conn, 2, '2022-2-12', 130.0)
+    insert_record(conn, 1, '2022-2-14', 37.6)
+
+    conn.close()
+    print("init successed!")
 
 def select_all_users(conn):
     cur = conn.cursor()
@@ -248,6 +300,8 @@ def update_record(conn, id, assignment, rectime, value):
 
 
 if __name__ == '__main__':
+    init_dataset()
+    
     conn = create_connection(db_dir)
     conn.create_function("check_role", 1, sqlite_custom_function)
 
