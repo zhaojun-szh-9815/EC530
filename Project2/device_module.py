@@ -251,9 +251,9 @@ if __name__ == '__main__':
     conn = create_connection(db_dir)
     conn.create_function("check_role", 1, sqlite_custom_function)
 
-    '''
     rows = select_all_users(conn)
     print_rows(rows)
+    '''
     last_id = insert_user(conn, 'DD', 'D', 'Male', 'Patient', '3333333333', '2022-02-18', 180, 78)
     last_id = insert_user(conn, 'DD', 'D', 'Male', 'Patient', '3333333333', '2022-02-18', 180, 78)
     last_id = delete_user(conn, 6)
@@ -264,9 +264,9 @@ if __name__ == '__main__':
     print_rows(rows)
     '''
 
-    '''
     rows = select_all_devices(conn)
     print_rows(rows)
+    '''
     insert_device(conn, '2022-02-20','Temperature')
     insert_device(conn, '2022-02-21','Pressure')
     insert_device(conn, '2022-02-21','Blood_Pressure')
@@ -280,9 +280,9 @@ if __name__ == '__main__':
     print_rows(rows)
     '''
     
-    '''
     rows = select_all_assignments(conn)
     print_rows(rows)
+    '''
     last_id = insert_assignment(conn, 2, 4, 5)
     last_id = insert_assignment(conn, 1, 4, 5)
     last_id = insert_assignment(conn, 3, 4, 5)
@@ -297,9 +297,9 @@ if __name__ == '__main__':
     print_rows(rows)
     '''
 
-    '''
     rows = select_all_records(conn)
     print_rows(rows)
+    '''
     last_id = insert_record(conn, 2, '2022-02-19', 140)
     last_id = insert_record(conn, 1, '2022-02-20', 36.5)
     rows = select_all_records(conn)
