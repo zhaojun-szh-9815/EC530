@@ -29,4 +29,5 @@ jobs:
           pip install pytest
       - name: test
         run: |
+          python ./Project2/device_module.py
           pytest ./Project2/test_device_module.py
