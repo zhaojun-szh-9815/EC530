@@ -91,10 +91,9 @@ def select_user(conn, id):
         return None
 
 def insert_user(conn, fn, ln, gender, role, phone, dob, h, w):
-    rows = select_all_users(conn)
-    new_user = (len(rows)+1, fn, ln, gender, role, phone, dob, h, w)
-    sql = ''' INSERT INTO users (U_ID, First_Name, Last_Name, Gender, Role, Phone, Date_of_Birth, Height_in_cm, Weight_in_kg)
-              VALUES(?,?,?,?,?,?,?,?,?) '''
+    new_user = (fn, ln, gender, role, phone, dob, h, w)
+    sql = ''' INSERT INTO users (First_Name, Last_Name, Gender, Role, Phone, Date_of_Birth, Height_in_cm, Weight_in_kg)
+              VALUES(?,?,?,?,?,?,?,?) '''
     cur = conn.cursor()
     try:
         cur.execute(sql, new_user)
@@ -147,10 +146,9 @@ def select_device(conn, id):
         return None
 
 def insert_device(conn, dor, dt):
-    rows = select_all_devices(conn)
-    new_device = (len(rows)+1, dor, dt)
-    sql = ''' INSERT INTO devices (D_ID, Date_of_Registration, Data_type)
-              VALUES(?,?,?) '''
+    new_device = (dor, dt)
+    sql = ''' INSERT INTO devices (Date_of_Registration, Data_type)
+              VALUES(?,?) '''
     cur = conn.cursor()
 
     try:
@@ -203,10 +201,9 @@ def select_assignment(conn, id):
         return None
 
 def insert_assignment(conn, rp, at, dev):
-    rows = select_all_assignments(conn)
-    new_assignment = (len(rows)+1, rp, at, dev)
-    sql = ''' INSERT INTO device_assignment (A_ID, Responsible_Person, Assign_to, Device)
-              VALUES(?,?,?,?) '''
+    new_assignment = (rp, at, dev)
+    sql = ''' INSERT INTO device_assignment (Responsible_Person, Assign_to, Device)
+              VALUES(?,?,?) '''
     cur = conn.cursor()
     try:
         cur.execute(sql, new_assignment)
@@ -259,10 +256,9 @@ def select_record(conn, id):
         return None
 
 def insert_record(conn, assignment, rectime, value):
-    rows = select_all_records(conn)
-    new_record = (len(rows)+1, assignment, rectime, value)
-    sql = ''' INSERT INTO record (R_ID, Assignment, Record_time, Value)
-              VALUES(?,?,?,?) '''
+    new_record = (assignment, rectime, value)
+    sql = ''' INSERT INTO record (Assignment, Record_time, Value)
+              VALUES(?,?,?) '''
     cur = conn.cursor()
     try:
         cur.execute(sql, new_record)
