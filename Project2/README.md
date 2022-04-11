@@ -27,11 +27,13 @@ Here are some example command to run the final version **[phase2 device module](
 Get: `curl http://10.0.0.61:5000/users -Method GET`  
 <img width="883" alt="project2_device1" src="https://user-images.githubusercontent.com/55321300/158283734-ed4eb390-9721-493a-b101-3b7e2c236d2f.PNG">
 
-Post: `curl http://10.0.0.61:5000/users -Method POST`  
-<img width="877" alt="project2_device2" src="https://user-images.githubusercontent.com/55321300/158283736-98f5aba1-1d18-4c8c-a261-feb2dbeb1bea.PNG">  
+Post: `curl http://10.0.0.61:5000/users -Body '<POST_INFORMATION>' -Method POST`  
+<img width="1243" alt="project2_device5" src="https://user-images.githubusercontent.com/55321300/162684570-ea7b5c81-1ee0-4774-9a02-7e4a2b695eaa.PNG">  
 
-Put: `curl http://10.0.0.61:5000/users -Method PUT`  
-<img width="877" alt="project2_device3" src="https://user-images.githubusercontent.com/55321300/158283738-7a528758-09d4-4bd4-bc76-19c2864df9d7.PNG">  
+Put: `curl http://10.0.0.61:5000/users -Body 'PUT_INFORMATION' -Method PUT`   
+<img width="1241" alt="project2_device6" src="https://user-images.githubusercontent.com/55321300/162684773-115b61f0-9d44-4261-b2fb-5badc41cfc5c.PNG">  
+The database constraint showed by this attempt. The database will not change if the update information doesn't meet the requirment.  
+<img width="1232" alt="project2_device7" src="https://user-images.githubusercontent.com/55321300/162684827-137392ed-8061-4fe6-abe5-ee33a09df6b1.PNG">  
 
 Delete: `curl http://10.0.0.61:5000/users/5 -Method DELETE`  
 <img width="905" alt="project2_device4" src="https://user-images.githubusercontent.com/55321300/158283739-d7e7fb47-ba07-423a-8378-47cbf7c0856e.PNG">  
@@ -84,3 +86,21 @@ And user can see a specific image with its name.
 For example, 'test.PNG' is my test image. And it can be shown on browser by address:  
 >http://10.0.0.61:5000/chats/2_4/media/test.PNG  
 >(It is only an example, it cannot link to the page)
+
+## Speech to Text
+
+**[Speech module](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/speech_api.py)** is implemented by deepspeech. It can get **wav** file
+ from client by 'curl -F'. And it will create job queue for speech to text process.  
+ 
+ To run this module, apart from running the speech module, you should install redis-server and run it by command **'redis-server'**. Then, install rq and run it in new terminal by **'rq worker'**. It will listen and do task in the queue. Finally, make request by curl.  
+ 
+ The test is on Linux.  
+ The *left terminal* runs redis-server. The *upward terminal* runs rq worker. The *right terminal* runs speech module as server. And the *downward terminal* is working as client.  
+ 
+ The client make request by command **curl http://127.0.0.1:5000/task -F 'audio=@audio.wav' -X POST**. And returns the number of jobs in queue.  
+ The Server record the request.  
+ The worker is doing its job and the prediction results will show on it. The result in the test is 'your paris sufficient i said'.  
+ The redis-server is working for worker.  
+ 
+ 
+ <img width="1006" alt="speech_queue" src="https://user-images.githubusercontent.com/55321300/162689344-a8c70ba0-3860-4fc5-8f7c-b25c0289cabd.PNG">
