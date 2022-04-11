@@ -18,13 +18,15 @@ def speech_to_text_task(filename):
     Mozilla_pretrained_model()
     output = predict(filename)
     time.sleep(2)
+    print(output)
     return output
 
 @app.route("/task", methods = ['POST'])
 def add_task():
     parse = reqparse.RequestParser()
-    parse.add_argument('audio', type=werkzeug.datastructures.FileStorage, location='form')
+    parse.add_argument('audio', type=werkzeug.datastructures.FileStorage, location='files')
     args = parse.parse_args()
+    # print(args)
     name = args["audio"].filename
     stream = args['audio'].stream
     try:
