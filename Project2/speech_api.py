@@ -58,7 +58,7 @@ def predict(name):
     if retcode == 0:
         return output[-1]
     else:
-        return f"Error! No file called {name}."
+        return str
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug = True)
