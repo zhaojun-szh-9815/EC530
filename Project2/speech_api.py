@@ -37,7 +37,7 @@ def add_task():
     signal = np.frombuffer(signal, np.int16)
     fr = wav_file.getframerate()
     wav_file.close()
-    save_name = f'./client_{name}.wav'
+    save_name = f'./client_{name}'
     save_file = open(f'./{save_name}','wb')
     write(save_file, fr, signal)
     save_file.close()
