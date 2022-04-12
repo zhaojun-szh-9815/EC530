@@ -85,7 +85,12 @@ This module do not have PUT method, which means the data cannot be modified.
 And user can see a specific image with its name.  
 For example, 'test.PNG' is my test image. And it can be shown on browser by address:  
 >http://10.0.0.61:5000/chats/2_4/media/test.PNG  
->(It is only an example, it cannot link to the page)
+>(It is only an example, it cannot link to the page)  
+
+And it needs localhost MongoDB. So I did its pytest on local.  
+
+<img width="720" alt="project2_chat_test" src="https://user-images.githubusercontent.com/55321300/162872393-14a3aa15-c870-4a7b-8096-b4c55b348c98.PNG">
+
 
 ## Speech to Text
 
@@ -104,3 +109,9 @@ For example, 'test.PNG' is my test image. And it can be shown on browser by addr
  
  
  <img width="1006" alt="speech_queue" src="https://user-images.githubusercontent.com/55321300/162689344-a8c70ba0-3860-4fc5-8f7c-b25c0289cabd.PNG">
+
+The module needs to download pretrained module from deepspeech.  
+The downloading process is hard to implement into workflow.  
+So I did pytest in local linux environment.  
+
+<img width="800" alt="project2_speech_test" src="https://user-images.githubusercontent.com/55321300/162872598-45af3457-d0fe-4b24-abb7-cf3bf14911d7.PNG">
