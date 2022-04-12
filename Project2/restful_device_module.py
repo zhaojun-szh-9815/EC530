@@ -1,21 +1,21 @@
 import sqlite3
 import os
 import json
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Resource, Api
 
 app = Flask(__name__)
 api = Api(app)
 db = './ec530_p2.db'
-user_path = './user.json'
-device_path = './device.json'
-assignment_path = './assignment.json'
-record_path = './record.json'
 
 class init(Resource):
     def get(self):
         init_dataset()
         return init_data()
+
+class User_Password(Resource):
+    def get(self, username):
+        return select_user_password(username)
 
 class User_get_del(Resource):
     def get(self, todo_id):
@@ -23,13 +23,20 @@ class User_get_del(Resource):
     def delete(self, todo_id):
         return delete_user(todo_id)
 
+class User_related(Resource):
+    def get(self, id):
+        return select_related(id)
+
 class User_edit_add(Resource):
     def get(self):
         return select_all_users()
     def put(self):
-        return edit_user()
+        json_request = json.loads(request.get_data(as_text = True))
+        return update_user(json_request["U_ID"], json_request["Username"], json_request["Password"], json_request["Phone"], json_request["Height_in_cm"], json_request["Weight_in_kg"])
     def post(self):
-        return new_user()
+        json_request = json.loads(request.get_data(as_text = True))
+        return insert_user(json_request["Username"], json_request["Password"], json_request["First_Name"], json_request["Last_Name"], json_request["Gender"], json_request["Role"],
+                        json_request["Phone"], json_request["Date_of_Birth"], json_request["Height_in_cm"], json_request["Weight_in_kg"])
 
 class Device_get_del(Resource):
     def get(self, todo_id):
@@ -41,9 +48,11 @@ class Device_edit_add(Resource):
     def get(self):
         return select_all_devices()
     def put(self):
-        return edit_device()
+        device = json.loads(request.get_data(as_text = True))
+        return update_device(device["D_ID"], device["Date_of_Registration"], device["Data_type"])
     def post(self):
-        return new_device()
+        device = json.loads(request.get_data(as_text = True))
+        return insert_device(device["Date_of_Registration"], device["Data_type"])
 
 class Assignment_get_del(Resource):
     def get(self, todo_id):
@@ -55,9 +64,11 @@ class Assignment_edit_add(Resource):
     def get(self):
         return select_all_assignments()
     def put(self):
-        return edit_assignment()
+        assignment = json.loads(request.get_data(as_text = True))
+        return update_assignment(assignment["A_ID"], assignment["Responsible_Person"], assignment["Assign_to"], assignment["Device"])
     def post(self):
-        return new_assignment()
+        assignment = json.loads(request.get_data(as_text = True))
+        return insert_assignment(assignment["Responsible_Person"], assignment["Assign_to"], assignment["Device"])
 
 class Record_get_del(Resource):
     def get(self, todo_id):
@@ -69,9 +80,11 @@ class Record_edit_add(Resource):
     def get(self):
         return select_all_records()
     def put(self):
-        return edit_record()
+        record = json.loads(request.get_data(as_text = True))
+        return update_record(record["R_ID"], record["Assignment"], record["Record_time"], record["Value"])
     def post(self):
-        return new_record()
+        record = json.loads(request.get_data(as_text = True))
+        return insert_record(record["Assignment"], record["Record_time"], record["Value"])
 
 
 def create_connection(db_file):
@@ -84,12 +97,12 @@ def create_connection(db_file):
 
 def sqlite_custom_function(id):
     conn = create_connection(db)
-    conn.create_function("check_role", 1, sqlite_custom_function)
+    #conn.create_function("check_role", 1, sqlite_custom_function)
     cur = conn.cursor()
-    cur.execute("SELECT * FROM users where U_ID = ?", (id,))
+    cur.execute("SELECT Role FROM users where U_ID = ?", (id,))
     rows = cur.fetchall()
-    user = rows[0]
-    return user[4]
+    role = rows[0]
+    return role[0]
 
 def create_table(sql):
     conn = create_connection(db)
@@ -109,7 +122,7 @@ def init_dataset():
     conn.create_function("check_role", 1, sqlite_custom_function)
     sqlite3.enable_callback_tracebacks(True)
 
-    sql_create_users = '''CREATE TABLE users (U_ID INTEGER PRIMARY KEY AUTOINCREMENT, First_Name TEXT NOT NULL, Last_Name TEXT NOT NULL, Gender TEXT CHECK (Gender IN ('Male', 'Female')) DEFAULT ('Male') NOT NULL, Role TEXT CHECK (Role IN ('Doctor', 'Nurse', 'Patient', 'Family', 'Developer')) NOT NULL DEFAULT ('Patient'), Phone TEXT CHECK (LENGTH(Phone) = 10) DEFAULT (0), Date_of_Birth DATETIME NOT NULL, Height_in_cm INT NOT NULL, Weight_in_kg INT NOT NULL);'''
+    sql_create_users = '''CREATE TABLE users (U_ID INTEGER PRIMARY KEY AUTOINCREMENT, Username TEXT NOT NULL, Password TEXT NOT NULL, First_Name TEXT NOT NULL, Last_Name TEXT NOT NULL, Gender TEXT CHECK (Gender IN ('Male', 'Female')) DEFAULT ('Male') NOT NULL, Role TEXT CHECK (Role IN ('Doctor', 'Nurse', 'Patient', 'Family', 'Developer')) NOT NULL DEFAULT ('Patient'), Phone TEXT CHECK (LENGTH(Phone) = 10) DEFAULT (0), Date_of_Birth DATETIME NOT NULL, Height_in_cm INT NOT NULL, Weight_in_kg INT NOT NULL);'''
 
     sql_create_devices = '''CREATE TABLE devices (D_ID INTEGER PRIMARY KEY AUTOINCREMENT, Date_of_Registration DATETIME NOT NULL, Data_type TEXT NOT NULL CHECK (Data_type IN ('Temperature', 'Blood_Pressure', 'Pluse', 'Blood_Oxygen', 'Blood_Glucose')));'''
 
@@ -132,10 +145,10 @@ def init_data():
     conn.create_function("check_role", 1, sqlite_custom_function)
     sqlite3.enable_callback_tracebacks(True)
 
-    insert_user('ZH', 'S', 'Male', 'Developer', '0123456789', '1998-01-05', 175, 80)
-    insert_user('AA', 'A', 'Female', 'Doctor', '1234567890', '1997-04-02', 170, 50)
-    insert_user('BB', 'B', 'Female', 'Nurse', '0000011111', '1999-02-18', 168, 48)
-    insert_user('CC', 'C', 'Male', 'Patient', '1111100000', '2000-11-06', 180, 78)
+    insert_user('zhaojun', '11111', 'ZH', 'S', 'Male', 'Developer', '0123456789', '1998-01-05', 175, 80)
+    insert_user('aa', '222', 'AA', 'A', 'Female', 'Doctor', '1234567890', '1997-04-02', 170, 50)
+    insert_user('bb', '333', 'BB', 'B', 'Female', 'Nurse', '0000011111', '1999-02-18', 168, 48)
+    insert_user('ccc', '4444', 'CC', 'C', 'Male', 'Patient', '1111100000', '2000-11-06', 180, 78)
 
     insert_device('2019-01-01', 'Temperature')
     insert_device('2019-01-02', 'Blood_Pressure')
@@ -165,14 +178,15 @@ def select_all_users():
     for row in rows:
         row_ans = dict()
         row_ans["U_ID"] = row[0]
-        row_ans["First_Name"] = row[1]
-        row_ans["Last_Name"] = row[2]
-        row_ans["Gender"] = row[3]
-        row_ans["Role"] = row[4]
-        row_ans["Phone"] = row[5]
-        row_ans["Date_of_Birth"] = row[6]
-        row_ans["Height_in_cm"] = row[7]
-        row_ans["Weight_in_kg"] = row[8]
+        row_ans["Username"] = row[1]
+        row_ans["First_Name"] = row[3]
+        row_ans["Last_Name"] = row[4]
+        row_ans["Gender"] = row[5]
+        row_ans["Role"] = row[6]
+        row_ans["Phone"] = row[7]
+        row_ans["Date_of_Birth"] = row[8]
+        row_ans["Height_in_cm"] = row[9]
+        row_ans["Weight_in_kg"] = row[10]
         ans[f"user{num}"] = row_ans
         num += 1
     return ans
@@ -190,33 +204,66 @@ def select_user(id):
         return None
     ans = dict()
     ans["U_ID"] = row[0]
-    ans["First_Name"] = row[1]
-    ans["Last_Name"] = row[2]
-    ans["Gender"] = row[3]
-    ans["Role"] = row[4]
-    ans["Phone"] = row[5]
-    ans["Date_of_Birth"] = row[6]
-    ans["Height_in_cm"] = row[7]
-    ans["Weight_in_kg"] = row[8]
+    ans["Username"] = row[1]
+    ans["First_Name"] = row[3]
+    ans["Last_Name"] = row[4]
+    ans["Gender"] = row[5]
+    ans["Role"] = row[6]
+    ans["Phone"] = row[7]
+    ans["Date_of_Birth"] = row[8]
+    ans["Height_in_cm"] = row[9]
+    ans["Weight_in_kg"] = row[10]
     return ans
 
-def new_user():
-    if not os.path.exists(user_path):
-        print("No new user's information. It should be a json file.")
-        return
-    with open(user_path,'r') as f:
-        file = json.load(f)
-    user = file["new_user"]
-    f.close()
-    u_id = insert_user(user["First_Name"], user["Last_Name"], user["Gender"], user["Role"], user["Phone"], user["Date_of_Birth"], user["Height_in_cm"], user["Weight_in_kg"])
-    return select_user(u_id)
-
-def insert_user(fn, ln, gender, role, phone, dob, h, w):
+def select_related(id):
     conn = create_connection(db)
     conn.create_function("check_role", 1, sqlite_custom_function)
-    new_user = (fn, ln, gender, role, phone, dob, h, w)
-    sql = ''' INSERT INTO users (First_Name, Last_Name, Gender, Role, Phone, Date_of_Birth, Height_in_cm, Weight_in_kg)
-                VALUES(?,?,?,?,?,?,?,?) '''
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM device_assignment where Responsible_Person = ? or Assign_to = ?", (id, id,))
+    rows = cur.fetchall()
+    try:
+        r = rows[0]
+    except Exception as e:
+        print(f"No related user given U_ID = {id}")
+        print(rows)
+        return None
+    resp = dict()
+    ans = dict()
+    if r[1] == id:
+        resp["Title"] = "Your Patients"
+        i = 1
+        for row in rows:
+            ans[f"{i}"] = select_user(row[2])["First_Name"]
+        resp["Content"] = ans
+    if r[2] == id:
+        resp["Title"] = "Your Doctor/Nurse"
+        i = 1
+        for row in rows:
+            ans[f"{i}"] = select_user(row[1])["First_Name"]
+        resp["Content"] = ans
+    return resp
+
+def select_user_password(username):
+    conn = create_connection(db)
+    conn.create_function("check_role", 1, sqlite_custom_function)
+    cur = conn.cursor()
+    cur.execute("SELECT Password FROM users where Username = ?", (username,))
+    rows = cur.fetchall()
+    try:
+        row = rows[0]
+    except Exception as e:
+        print(f"No user with Username = {username}")
+        return None
+    ans = dict()
+    ans["Password"] = row[0]
+    return ans
+
+def insert_user(un, pw, fn, ln, gender, role, phone, dob, h, w):
+    conn = create_connection(db)
+    conn.create_function("check_role", 1, sqlite_custom_function)
+    new_user = (un, pw, fn, ln, gender, role, phone, dob, h, w)
+    sql = ''' INSERT INTO users (Username, Password, First_Name, Last_Name, Gender, Role, Phone, Date_of_Birth, Height_in_cm, Weight_in_kg)
+                VALUES(?,?,?,?,?,?,?,?,?,?) '''
     cur = conn.cursor()
     try:
         cur.execute(sql, new_user)
@@ -239,22 +286,14 @@ def delete_user(id):
     conn.close()
     return select_all_users()
 
-def edit_user():
-    if not os.path.exists(user_path):
-        print("No update user's information. It should be a json file.")
-        return
-    with open(user_path,'r') as f:
-        file = json.load(f)
-    user = file["update_user"]
-    f.close()
-    return update_user(user["U_ID"], user["Phone"], user["Height_in_cm"], user["Weight_in_kg"])
-
-def update_user(id, phone, h, w):
+def update_user(un, pw, id, phone, h, w):
     conn = create_connection(db)
     conn.create_function("check_role", 1, sqlite_custom_function)
-    update_info = (phone, h, w, id)
+    update_info = (un, pw, phone, h, w, id)
     sql = ''' UPDATE users
-                SET Phone = ? ,
+                SET Username = ? ,
+                    Password = ? ,
+                    Phone = ? ,
                     Height_in_cm = ? ,
                     Weight_in_kg = ?
                 WHERE U_ID = ?'''
@@ -303,17 +342,6 @@ def select_device(id):
     ans["Data_Type"] = row[2]
     return ans
 
-def new_device():
-    if not os.path.exists(device_path):
-        print("No new device's information. It should be a json file.")
-        return
-    with open(device_path,'r') as f:
-        file = json.load(f)
-    device = file["new_device"]
-    f.close()
-    d_id = insert_device(device["Date_of_Registration"], device["Data_type"])
-    return select_device(d_id)
-
 def insert_device(dor, dt):
     conn = create_connection(db)
     conn.create_function("check_role", 1, sqlite_custom_function)
@@ -342,16 +370,6 @@ def delete_device(id):
         print(e)
     conn.close()
     return select_all_devices()
-
-def edit_device():
-    if not os.path.exists(device_path):
-        print("No update device's information. It should be a json file.")
-        return
-    with open(device_path,'r') as f:
-        file = json.load(f)
-    device = file["update_device"]
-    f.close()
-    return update_device(device["D_ID"], device["Date_of_Registration"], device["Data_type"])
 
 def update_device(id, dor, dt):
     conn = create_connection(db)
@@ -408,17 +426,6 @@ def select_assignment(id):
     ans["Device"] = row[3]
     return ans
 
-def new_assignment():
-    if not os.path.exists(assignment_path):
-        print("No new assignment's information. It should be a json file.")
-        return
-    with open(assignment_path,'r') as f:
-        file = json.load(f)
-    assignment = file["new_assignment"]
-    f.close()
-    a_id = insert_assignment(assignment["Responsible_Person"], assignment["Assign_to"], assignment["Device"])
-    return select_assignment(a_id)
-
 def insert_assignment(rp, at, dev):
     conn = create_connection(db)
     conn.create_function("check_role", 1, sqlite_custom_function)
@@ -446,16 +453,6 @@ def delete_assignment(id):
         print(e)
     conn.close()
     return select_all_assignments()
-
-def edit_assignment():
-    if not os.path.exists(assignment_path):
-        print("No update assignment's information. It should be a json file.")
-        return
-    with open(assignment_path,'r') as f:
-        file = json.load(f)
-    assignment = file["update_assignment"]
-    f.close()
-    return update_assignment(assignment["A_ID"], assignment["Responsible_Person"], assignment["Assign_to"], assignment["Device"])
 
 def update_assignment(id, rp, at, dev):
     conn = create_connection(db)
@@ -513,18 +510,6 @@ def select_record(id):
     ans["Value"] = row[3]
     return ans
 
-def new_record():
-    if not os.path.exists(record_path):
-        print("No new record's information. It should be a json file.")
-        return
-    with open(record_path,'r') as f:
-        file = json.load(f)
-    record = file["new_record"]
-    print(record)
-    f.close()
-    r_id = insert_record(record["Assignment"], record["Record_time"], record["Value"])
-    return select_record(r_id)
-
 def insert_record(assignment, rectime, value):
     conn = create_connection(db)
     conn.create_function("check_role", 1, sqlite_custom_function)
@@ -553,16 +538,6 @@ def delete_record(id):
     conn.close()
     return select_all_records()
 
-def edit_record():
-    if not os.path.exists(record_path):
-        print("No update record's information. It should be a json file.")
-        return
-    with open(record_path,'r') as f:
-        file = json.load(f)
-    record = file["update_record"]
-    f.close()
-    return update_record(record["R_ID"], record["Assignment"], record["Record_time"], record["Value"])
-
 def update_record(id, assignment, rectime, value):
     conn = create_connection(db)
     conn.create_function("check_role", 1, sqlite_custom_function)
@@ -582,7 +557,9 @@ def update_record(id, assignment, rectime, value):
     return select_record(id)
 
 api.add_resource(init, '/')
+api.add_resource(User_Password, '/user_password/<username>')
 api.add_resource(User_get_del, '/users/<int:todo_id>')
+api.add_resource(User_related, '/users/related/<int:id>')
 api.add_resource(User_edit_add, '/users')
 api.add_resource(Device_get_del, '/devices/<int:todo_id>')
 api.add_resource(Device_edit_add, '/devices')
