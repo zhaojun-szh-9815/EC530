@@ -1,4 +1,0 @@
-{"1": {"From": 2, "To": 4, "Message_Type":"Text", "Message": "Hello!"},
-"2": {"From": 4, "To": 2, "Message_Type":"Text", "Message": "Hello Doctor"},
-"3": {"From": 2, "To": 4, "Message_Type":"Image", "Message": "test.PNG"},
-"4": {"From": 4, "To": 2, "Message_Type":"Text", "Message": "Got it!"}}

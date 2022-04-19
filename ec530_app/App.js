@@ -7,7 +7,9 @@ import {
   Text,
   TextInput,
   ScrollView,
+  FlatList,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -101,27 +103,31 @@ function HomeScreen({route, navigation}) {
     .then(response => response.json())
     .then(json => {
       setTitle(json.Title)
-      var arr = [];
+      const arr = []
       if (json.Content != null) {
         Object.keys(json.Content).forEach(function(key) {
-          arr.push(json.Content[key]);
+          arr.push({id: json.Content[key]["ID"], key: json.Content[key]["First_name"]})
         });
       }
       setContent(arr)
-      return;
     })
     .catch((error) => {
-      console.error(error);
+      console.error(error)
     });
   }
 
 return (
-  <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-    <View style={styles.center}>
-      <Text>Welcome {ROLE} {NAME}!</Text>
-    </View>
+  <View style={styles.listcontainer}>
+    <Text>Welcome {ROLE} {NAME}!</Text>
     <Text>{Title}</Text>
-    <Text>{Content}</Text>
+    <FlatList
+      data = {Content}
+      renderItem={({item}) => 
+      <TouchableOpacity style={styles.listitem} onPress={() => navigation.navigate('Chat', {END1: ID, END2: item.id})}>
+      <Text style={styles.loginText}>{item.key}</Text>
+      </TouchableOpacity>}
+      //renderItem={({item}) => <Text style={styles.listitem}>{item.key}</Text>}
+    />
   </View>
 );
 }
@@ -284,6 +290,16 @@ function RegisterScreen({navigation}) {
   );
   }
 
+  function ChatScreen({route, navigation}) {
+    const { END1, END2 } = route.params;
+  
+  return (
+    <View style={styles.container}>
+      <Text>Chat between {END1} and {END2} will be push later</Text>
+    </View>
+  );
+  }
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -293,6 +309,7 @@ return (
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Chat" component={ChatScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );
@@ -306,6 +323,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  listcontainer: {
+    flex: 1,
+    paddingTop: 22,
+    backgroundColor: "#fff",
+    alignItems: "center",
+   },
+
+  listitem: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+  },
+
   Dropdowncontainer: {
     width: '70%',
     height: 80,
@@ -313,7 +343,7 @@ const styles = StyleSheet.create({
   },
 
   inputView: {
-    backgroundColor: "#C0C0C0",
+    backgroundColor: "#D0D0D0",
     borderRadius: 30,
     width: "70%",
     height: 45,
