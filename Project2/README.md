@@ -10,19 +10,16 @@ The design of SQL database for device module is shown on  **[Schema](https://git
 
 The **[phase1 device module](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/device_module.py)** do not have flask.  
 And **[phase2 device module](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/flask_device_module.py)** uses flask to make it as web service platform.  
-And **[phase2 device module](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/restful_device_module.py)** uses flask restful API to make it as web service platform.
+And **[phase2 device module](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/device_api.py)** uses flask restful API to make it as web service platform.
 
 The core of the device module is the SQL database.  
 The function called **sqlite_custom_function** is to create constrains in database, which limited the role of responsible_person can only be doctor and nurse and the role of assigned_to can only be patient.  
 
 The module will initial the SQL database, including create the database, create tables, and insert some test data.  
 And functions for **insert, delete, modify, and find** need parameters.  
-In web service platform, the parameters are given by url.  
-And **insert** function will look for related json file in workspace, which contains data to insert.  
-And **modify** function will look for related json file in workspace, which contains data to modify.
-The example json file is shown **[here](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/user.json)**
+In web service platform, the parameters are given by post request.  
 
-Here are some example command to run the final version **[phase2 device module](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/restful_device_module.py)**  
+Here are some example command to run the final version **[phase2 device module](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/device_api.py)**  
 
 Get: `curl http://10.0.0.61:5000/users -Method GET`  
 <img width="883" alt="project2_device1" src="https://user-images.githubusercontent.com/55321300/158283734-ed4eb390-9721-493a-b101-3b7e2c236d2f.PNG">
