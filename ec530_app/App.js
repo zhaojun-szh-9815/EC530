@@ -15,6 +15,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Dropdown } from 'sharingan-rn-modal-dropdown';
 
+const baseUrl = Platform.OS === 'android' ? 'http://10.0.2.2' : 'http://localhost';
+
 function LoginScreen({navigation}) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -34,7 +36,7 @@ function LoginScreen({navigation}) {
   const register = () => {navigation.navigate('Register')};
  
   const getlogin = async() => {
-    await fetch('http://10.0.0.61:5000/user_password/'+username+'/'+password)
+    await fetch(baseUrl+':5000/user_password/'+username+'/'+password)
     .then(response => response.json())
     .then(json => {
       setState(json.State)
@@ -99,7 +101,7 @@ function HomeScreen({route, navigation}) {
   }, [navigation]);
 
   const getrelated = async() => {
-    await fetch('http://10.0.0.61:5000/users/related/'+ID)
+    await fetch(baseUrl+':5000/users/related/'+ID)
     .then(response => response.json())
     .then(json => {
       setTitle(json.Title)
@@ -144,7 +146,7 @@ function RegisterScreen({navigation}) {
   const [Height_in_cm, setHeight] = useState("");
   const [Weight_in_kg, setWeight] = useState("");
   const onPress = async() => {
-    await fetch('http://10.0.0.61:5000/users', {
+    await fetch(baseUrl+':5000/users', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
