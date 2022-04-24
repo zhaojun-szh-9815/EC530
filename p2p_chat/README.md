@@ -23,7 +23,8 @@ react-native-gifted-chat
 <div align=center><img width="300" alt="p2p_chat3" src="https://user-images.githubusercontent.com/55321300/164969125-979db5f0-53a3-4cd1-b54c-d4b2f89f386f.jpg"></div>
 
 ### 3.3 Chat
-<div align=center><img width="300" alt="p2p_chat1" src="https://user-images.githubusercontent.com/55321300/164969136-63f6de4a-0113-42ac-8ed6-e8a1d255fdf1.jpg"></div>
-  
+<div align=center><img width="300" alt="p2p_chat1" src="https://user-images.githubusercontent.com/55321300/164969136-63f6de4a-0113-42ac-8ed6-e8a1d255fdf1.jpg">
+<img width="300" alt="p2p_chat" src="https://user-images.githubusercontent.com/55321300/164969348-de49d1a2-c6e8-4b11-a24d-540c99c91a45.PNG"></div>
+
 ## 4. reference
 Implementing by following the guide on **[here](https://www.youtube.com/watch?v=DnntmeVPLzc)**
