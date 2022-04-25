@@ -9,6 +9,8 @@ After login, the user will come to chatroom and can see the messages sent from e
 
 ## 2. Project library
 
+react-navigation/stack
+react-navigation/native
 react-native-elements  
 react-native-gesture-handler  
 firebase  
