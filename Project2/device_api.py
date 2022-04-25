@@ -122,7 +122,7 @@ def init_dataset():
     conn.create_function("check_role", 1, sqlite_custom_function)
     sqlite3.enable_callback_tracebacks(True)
 
-    sql_create_users = '''CREATE TABLE users (U_ID INTEGER PRIMARY KEY AUTOINCREMENT, Username TEXT NOT NULL, Password TEXT NOT NULL, First_Name TEXT NOT NULL, Last_Name TEXT NOT NULL, Gender TEXT CHECK (Gender IN ('Male', 'Female')) DEFAULT ('Male') NOT NULL, Role TEXT CHECK (Role IN ('Doctor', 'Nurse', 'Patient', 'Family', 'Developer')) NOT NULL DEFAULT ('Patient'), Phone TEXT CHECK (LENGTH(Phone) = 10) DEFAULT (0), Date_of_Birth DATETIME NOT NULL, Height_in_cm INT NOT NULL, Weight_in_kg INT NOT NULL);'''
+    sql_create_users = '''CREATE TABLE users (U_ID INTEGER PRIMARY KEY AUTOINCREMENT, Username TEXT NOT NULL UNIQUE, Password TEXT NOT NULL, First_Name TEXT NOT NULL, Last_Name TEXT NOT NULL, Gender TEXT CHECK (Gender IN ('Male', 'Female')) DEFAULT ('Male') NOT NULL, Role TEXT CHECK (Role IN ('Doctor', 'Nurse', 'Patient', 'Family', 'Developer')) NOT NULL DEFAULT ('Patient'), Phone TEXT CHECK (LENGTH(Phone) = 10) DEFAULT (0), Date_of_Birth DATETIME NOT NULL, Height_in_cm INT NOT NULL, Weight_in_kg INT NOT NULL);'''
 
     sql_create_devices = '''CREATE TABLE devices (D_ID INTEGER PRIMARY KEY AUTOINCREMENT, Date_of_Registration DATETIME NOT NULL, Data_type TEXT NOT NULL CHECK (Data_type IN ('Temperature', 'Blood_Pressure', 'Pluse', 'Blood_Oxygen', 'Blood_Glucose')));'''
 
@@ -149,6 +149,7 @@ def init_data():
     insert_user('aa', '222', 'AA', 'A', 'Female', 'Doctor', '1234567890', '1997-04-02', 170, 50)
     insert_user('bb', '333', 'BB', 'B', 'Female', 'Nurse', '0000011111', '1999-02-18', 168, 48)
     insert_user('ccc', '4444', 'CC', 'C', 'Male', 'Patient', '1111100000', '2000-11-06', 180, 78)
+    insert_user('zhaojun', '11111', 'ZH', 'S', 'Male', 'Developer', '0123456789', '1998-01-05', 175, 80)
 
     insert_device('2019-01-01', 'Temperature')
     insert_device('2019-01-02', 'Blood_Pressure')
