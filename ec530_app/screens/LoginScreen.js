@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react"
-import {View, Text, StyleSheet} from 'react-native'
+import {View, StyleSheet, Alert} from 'react-native'
 import { Input, Button } from "react-native-elements"
 import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth"
-import { auth } from '../firebase'
-
-//const baseUrl = Platform.OS === 'android' ? 'http://10.0.2.2' : 'http://localhost';
-const baseUrl = Platform.OS === 'android' ? 'http://10.0.0.61' : 'http://localhost';
+import { auth, baseUrl } from '../firebase'
 
 const LoginScreen = ({ navigation }) => {
     const [email, setemail] = useState('')
@@ -19,7 +16,9 @@ const LoginScreen = ({ navigation }) => {
         .then(json => {
         if (json.State == "Success") {
             setjson(json.Content)
-        } else return;
+        } else {
+            Alert.alert("Error", "Unsuccessed: "+json.State, [{text: "OK"}]);
+        };
         })
         .catch((error) => {
         console.error(error);

@@ -1,9 +1,9 @@
 import React, { useLayoutEffect, useState, useEffect, useCallback } from "react"
 import { ImageBackground, View, StyleSheet} from 'react-native'
-import { Text, Avatar, Tab, TabView } from "react-native-elements"
+import { Text, Avatar, Tab, TabView, Button } from "react-native-elements"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { AntDesign } from '@expo/vector-icons'
-import { auth, db } from '../firebase'
+import { auth, db, baseUrl } from '../firebase'
 import { signOut } from "firebase/auth";
 import { GiftedChat } from 'react-native-gifted-chat'
 
@@ -69,6 +69,17 @@ function HomeScreen({route, navigation}) {
             // An error happened.
           });
     }
+
+    const goRelated = async() => {
+        await fetch(baseUrl+':5000/users/related/'+Json.U_ID)
+        .then(response => response.json())
+        .then(json => {
+            navigation.navigate('Contacts', {ID: Json["U_ID"], Title: json.Title, Json: json.Content})
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+    }
   
   return (
       <>
@@ -92,7 +103,7 @@ function HomeScreen({route, navigation}) {
                 icon={{ name: 'home', type: 'material', color: 'white' }}
             />
             <Tab.Item
-                title="Contect"
+                title="Chat"
                 titleStyle={{ fontSize: 12 }}
                 icon={{ name: 'chat', type: 'material', color: 'white' }}
             />
@@ -109,13 +120,20 @@ function HomeScreen({route, navigation}) {
                     <Text style={styles.text}>Phone: {Json["Phone"]}</Text>
                     <Text style={styles.text}>Date_of_Birth: {Json["Date_of_Birth"]}</Text>
                     <Text style={styles.text}>Height(cm): {Json["Height_in_cm"]}</Text>
-                    <Text style={styles.text}>Weight)kg: {Json["Weight_in_kg"]}</Text>
+                    <Text style={styles.text}>Weight(kg): {Json["Weight_in_kg"]}</Text>
                 </View>
             </TabView.Item>
             <TabView.Item style={{ width: '100%' }}>
                 <View style={{flex: 1}}>
                     <ImageBackground source={image} resizeMode="cover" style={{flex: 1, paddingTop: '10%'}}>
-                        <Text style={{textAlign: 'center', fontSize: 23, fontWeight: "bold"}}>Welcome {Json["Role"]} {Json["First_Name"]}!</Text>
+                        <View style={{alignItems: 'center'}}>
+                            <Text style={{textAlign: 'center', fontSize: 23, fontWeight: "bold"}}>Welcome {Json["Role"]} {Json["First_Name"]}!</Text>
+                            <Button title={Json.Role=='Patient'?'Your Doctors/Nurses':'Your Patients'} containerStyle={{
+                                width: 200,
+                                marginHorizontal: 50,
+                                marginVertical:'5%'
+                            }} onPress = {() => goRelated()} />
+                        </View>
                     </ImageBackground>
                 </View>
             </TabView.Item>

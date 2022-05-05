@@ -2,10 +2,7 @@ import React, { useState } from "react"
 import { Alert, View, StyleSheet, ScrollView } from 'react-native'
 import { Input, Button, CheckBox, ButtonGroup } from "react-native-elements"
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth"
-import { auth } from '../firebase'
-
-//const baseUrl = Platform.OS === 'android' ? 'http://10.0.2.2' : 'http://localhost';
-const baseUrl = Platform.OS === 'android' ? 'http://10.0.0.61' : 'http://localhost';
+import { auth, baseUrl } from '../firebase'
 
 const RegisterScreen = ({ navigation }) => {
     const [email, setemail] = useState('')

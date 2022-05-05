@@ -2,6 +2,10 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 
+//const baseUrl = Platform.OS === 'android' ? 'http://10.0.2.2' : 'http://localhost';
+//const baseUrl = Platform.OS === 'android' ? 'http://10.0.0.61' : 'http://localhost';
+const baseUrl = Platform.OS === 'android' ? 'http://155.41.95.186' : 'http://localhost';
+
 const firebaseConfig = {
     apiKey: "AIzaSyAXV9NYiUmF8X418HDcciVGv94Vxzv50rY",
     authDomain: "chat-5a2b8.firebaseapp.com",
@@ -19,4 +23,4 @@ const firebaseConfig = {
   }
   const db = app.firestore();
   const auth = firebase.auth();
-  export {db, auth};
+  export {db, auth, baseUrl};

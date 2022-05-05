@@ -145,11 +145,11 @@ def init_data():
     conn.create_function("check_role", 1, sqlite_custom_function)
     sqlite3.enable_callback_tracebacks(True)
 
-    insert_user('zhaojun', '11111', 'ZH', 'S', 'Male', 'Developer', '0123456789', '1998-01-05', 175, 80)
-    insert_user('aa', '222', 'AA', 'A', 'Female', 'Doctor', '1234567890', '1997-04-02', 170, 50)
-    insert_user('bb', '333', 'BB', 'B', 'Female', 'Nurse', '0000011111', '1999-02-18', 168, 48)
-    insert_user('ccc', '4444', 'CC', 'C', 'Male', 'Patient', '1111100000', '2000-11-06', 180, 78)
-    insert_user('zhaojun', '11111', 'ZH', 'S', 'Male', 'Developer', '0123456789', '1998-01-05', 175, 80)
+    insert_user('zhaojunnnnn', '111111', 'Zihao', 'Shen', 'Male', 'Developer', '8572103447', '1998-01-05', 175, 85)
+    insert_user('doctora', '222222', 'AA', 'A', 'Female', 'Doctor', '1234567890', '1997-04-02', 170, 50)
+    insert_user('nurseb', '333333', 'BB', 'B', 'Female', 'Nurse', '0000011111', '1999-02-18', 168, 48)
+    insert_user('zhaojun', '123456', 'Zihao', 'Shen', 'Male', 'Patient', '8572103447', '1998-01-05', 175, 85)
+    insert_user('patientc', '444444', 'CC', 'C', 'Male', 'Patient', '1111100000', '2000-11-06', 180, 78)
 
     insert_device('2019-01-01', 'Temperature')
     insert_device('2019-01-02', 'Blood_Pressure')
