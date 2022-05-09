@@ -18,9 +18,9 @@ react-native-gifted-chat
 
 ## 3. API
 
-This project used **[device_api](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/device_api.py)** in project2.  
-When run this project, make sure run device api firstly.  
-And when register, the user will register in my device_api and firebase at the same time automatically.  
+This project used **[device_api](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/device_api.py)** and **[chat_api](https://github.com/zhaojun-szh-9815/EC530/blob/main/Project2/chat_api.py)** in project2.  
+When run this project, make sure run device and chat api firstly.  
+And when register, the user will register in my device_api, chat_api and firebase at the same time automatically.  
 
 ## 4. Demonstration
 
