@@ -3,8 +3,8 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 
 //const baseUrl = Platform.OS === 'android' ? 'http://10.0.2.2' : 'http://localhost';
-//const baseUrl = Platform.OS === 'android' ? 'http://10.0.0.61' : 'http://localhost';
-const baseUrl = Platform.OS === 'android' ? 'http://155.41.95.186' : 'http://localhost';
+const baseUrl = Platform.OS === 'android' ? 'http://10.0.0.61' : 'http://localhost';
+//const baseUrl = Platform.OS === 'android' ? 'http://155.41.95.186' : 'http://localhost';
 
 const firebaseConfig = {
     apiKey: "AIzaSyAXV9NYiUmF8X418HDcciVGv94Vxzv50rY",
